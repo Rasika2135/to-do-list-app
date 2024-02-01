@@ -1,23 +1,72 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
 
 function App() {
+  const [newTask, setNewTask] = useState('');
+  const [tasks, setTasks] = useState([]);
+
+  const handleInputChange = (e) => {
+    setNewTask(e.target.value);
+  };
+
+  const handleAddTask = () => {
+    if (newTask.trim() !== '') {
+      const newTaskObject = {
+        id: Date.now(),
+        text: newTask,
+        completed: false,
+      };
+      setTasks([...tasks, newTaskObject]);
+      setNewTask('');
+    }
+  };
+
+  const handleToggleChange = (id) => {
+    const updatedTasks = tasks.map((task) => {
+      if (task.id === id) {
+        return { ...task, completed: !task.completed };
+      }
+      return task;
+    });
+    setTasks(updatedTasks);
+  };
+
+  const removeTask = (taskId) => {
+    const updatedTasks = tasks.filter((task) => task.id !== taskId);
+    setTasks(updatedTasks);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>To-Do List</h1>
+      <div>
+        <input
+          type="text"
+          value={newTask}
+          onChange={handleInputChange}
+          placeholder="Add a new task"
+        />
+        <button onClick={handleAddTask}>Add</button>
+      </div>
+      <ul>
+        {tasks.map((task) => (
+          <li key={task.id}>
+            <input
+              type="checkbox"
+              checked={task.completed}
+              onChange={() => handleToggleChange(task.id)}
+            />
+            <span
+              style={{
+                textDecoration: task.completed ? 'line-through' : 'none',
+              }}
+            >
+              {task.text}
+            </span>
+            <button onClick={() => removeTask(task.id)}>Remove</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
